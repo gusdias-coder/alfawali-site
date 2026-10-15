@@ -1,0 +1,35 @@
+---
+import ProductArt from './ProductArt.astro';
+import Icon from './Icon.astro';
+import { path } from '../lib/urls';
+import type { Product } from '../data/products';
+interface Props { product: Product }
+const { product } = Astro.props;
+const media = product.images?.length ? product.images.map(image => ({ ...image, zoom: false })) : [
+  { src: '', alt: `${product.name}: visão geral ilustrativa`, zoom: false },
+  { src: '', alt: `${product.name}: ampliação da ilustração`, zoom: true },
+];
+---
+<section class="product-gallery" data-product-gallery aria-label={`Imagens de ${product.name}`}>
+  <div class="gallery-stage">
+    {media.map((image,index) => <div class:list={['gallery-panel', { 'illustration-zoom': image.zoom }]} data-gallery-panel={index} hidden={index !== 0} role="img" aria-label={image.alt}>
+      {image.src ? <img src={path(image.src)} alt={image.alt} width="1000" height="1000" loading={index ? 'lazy' : 'eager'}/> : <ProductArt kind={product.illustration}/>}
+    </div>)}
+    <span class="gallery-badge">{product.images?.length ? (product.demo ? 'Imagem de demonstração' : 'Imagens do produto') : 'Ilustração de demonstração'}</span>
+    <button class="gallery-expand" type="button" data-gallery-expand aria-haspopup="dialog"><Icon name="search" size={18}/> Ampliar imagem</button>
+  </div>
+  <div class="gallery-navigation"><p data-gallery-caption aria-live="polite">1 / {media.length} · {media[0].alt}</p><div><button class="icon-button" type="button" data-gallery-prev aria-label="Imagem anterior" disabled={media.length < 2}>←</button><button class="icon-button" type="button" data-gallery-next aria-label="Próxima imagem" disabled={media.length < 2}>→</button></div></div>
+  <div class="gallery-thumbnails" aria-label="Escolher imagem">
+    {media.map((image,index) => <button class:list={['gallery-thumbnail', { 'illustration-zoom': image.zoom }]} type="button" data-gallery-thumbnail={index} aria-pressed={index === 0 ? 'true' : 'false'} aria-label={`Ver imagem ${index + 1}: ${image.alt}`}>
+      {image.src ? <img src={path(image.src)} alt="" width="100" height="100" loading="lazy"/> : <ProductArt kind={product.illustration}/>}
+    </button>)}
+  </div>
+  {!product.images?.length && <p class="gallery-note">As fotos reais serão adicionadas após a confirmação do produto. As duas visualizações acima usam a mesma ilustração de exemplo.</p>}
+  <dialog class="image-dialog" data-image-dialog aria-label={`Visualização ampliada: ${product.name}`}>
+    <div class="image-dialog-header"><p>{product.name}</p><button class="icon-button" type="button" data-image-close aria-label="Fechar imagem ampliada"><Icon name="close" size={20}/></button></div>
+    <div class="image-dialog-stage">{media.map((image,index) => <div class:list={['gallery-panel', { 'illustration-zoom': image.zoom }]} data-gallery-panel={index} hidden={index !== 0} role="img" aria-label={image.alt}>
+      {image.src ? <img src={path(image.src)} alt={image.alt} width="1000" height="1000" loading="lazy"/> : <ProductArt kind={product.illustration}/>}
+    </div>)}</div>
+    <div class="gallery-navigation"><p data-gallery-caption aria-live="polite">1 / {media.length} · {media[0].alt}</p><div><button class="icon-button" type="button" data-gallery-prev aria-label="Imagem anterior" disabled={media.length < 2}>←</button><button class="icon-button" type="button" data-gallery-next aria-label="Próxima imagem" disabled={media.length < 2}>→</button></div></div>
+  </dialog>
+</section>

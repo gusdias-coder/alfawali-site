@@ -32,6 +32,7 @@ GitHub Pages é usado **somente como demonstração para aprovação**. Antes de
 
 - `src/data/company.ts`: empresa, telefone, categorias, serviços e logos autorizados de clientes.
 - `src/data/products.ts`: produtos. Há **16 exemplos ilustrativos**, não um estoque real. O escopo inicial permite cadastrar até 30 itens, após recebimento dos materiais.
+- Cada produto tem sua página em `produtos/<id>/`, com descrição completa, ficha técnica, galeria de miniaturas, ampliação e quantidade para cotação. Foto e título no catálogo também abrem os detalhes.
 - `public/images/`: logo e aplicação de marca. A imagem da placa é uma aplicação visual, não uma fotografia comprovada de sede.
 - `src/pages/`: textos e estrutura das páginas.
 - `src/styles/global.css`: identidade visual e responsividade.
@@ -39,6 +40,34 @@ GitHub Pages é usado **somente como demonstração para aprovação**. Antes de
 Não foram inventados CNPJ, endereço, e-mail, preços, marcas de clientes, certificações ou depoimentos. Não há checkout, cobrança, login, painel administrativo, banco de dados, chatbot ou integrações de estoque. Catálogo PDF completo é solicitado ao atendimento; o site não promete um arquivo inexistente.
 
 Domínio, e-mails profissionais e hospedagem comercial precisam ser contratados/configurados separadamente. Propostas, documentos comerciais e arquivos temporários locais não fazem parte do repositório.
+
+## Cadastrar os detalhes reais
+
+Em `src/data/products.ts`, mantenha o `id` do produto para preservar links e cotações salvas. Adicione os campos opcionais no objeto existente:
+
+```ts
+fullDescription: [
+  'Descrição completa aprovada pelo fornecedor.',
+  'Informações adicionais de uso e conservação aprovadas.',
+],
+specifications: {
+  brand: 'Marca confirmada',
+  reference: 'Código do fabricante',
+  dimensions: 'Medidas com unidade',
+  weight: 'Peso com unidade',
+  capacity: 'Volume ou capacidade com unidade',
+  material: 'Material ou composição',
+  color: 'Cor confirmada',
+  packaging: 'Apresentação / quantidade por embalagem',
+  additional: [{ label: 'Outra característica', value: 'Valor confirmado' }],
+},
+images: [
+  { src: 'images/produtos/codigo-frente.webp', alt: 'Nome do produto visto de frente' },
+  { src: 'images/produtos/codigo-embalagem.webp', alt: 'Embalagem e rótulo do produto' },
+],
+```
+
+As fotos devem existir em `public/images/produtos/` (o caminho em `src` não começa com `public/`). A primeira aparece no catálogo; todas aparecem na galeria. Use fotos autorizadas e textos alternativos descritivos. Não preencha uma característica desconhecida: campos ausentes exibem “A confirmar”. Sem fotos cadastradas, a galeria usa uma ilustração com duas visualizações identificadas como demonstração. Troque `demo` apenas após validar o cadastro; o site inteiro continua sendo uma apresentação até sua aprovação de produção.
 
 ## Antes de lançar para clientes reais
 

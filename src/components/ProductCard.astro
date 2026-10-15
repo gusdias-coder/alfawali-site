@@ -3,11 +3,13 @@ import Icon from './Icon.astro';
 import ProductArt from './ProductArt.astro';
 import { categories } from '../data/company';
 import type { Product } from '../data/products';
+import { path } from '../lib/urls';
 interface Props { product: Product }
 const { product } = Astro.props;
 const category = categories.find(c => c.id === product.category)!;
+const detailsUrl = path(`produtos/${product.id}/`);
 ---
 <article class="product-card" data-product-card data-id={product.id} data-category={product.category} data-name={product.name}>
-  <div class="product-visual"><span class="demo-label">Exemplo ilustrativo</span><ProductArt kind={product.illustration}/></div>
-  <div class="product-content"><span class="eyebrow muted">{category.name}</span><h3>{product.name}</h3><p>{product.description}</p><div class="product-bottom"><span>Por {product.unit}<small>Sob consulta</small></span><button class="add-button" type="button" data-add={product.id} aria-label={`Adicionar ${product.name} à cotação`}><Icon name="plus" size={19}/><span>Adicionar</span></button></div></div>
+  <a class="product-visual product-visual-link" href={detailsUrl} aria-label={`Ver detalhes de ${product.name}`}><span class="demo-label">{product.demo ? 'Exemplo ilustrativo' : category.name}</span>{product.images?.length ? <img class="catalog-product-image" src={path(product.images[0].src)} alt={product.images[0].alt} loading="lazy" width="600" height="440"/> : <ProductArt kind={product.illustration}/>}</a>
+  <div class="product-content"><span class="eyebrow muted">{category.name}</span><h3><a href={detailsUrl}>{product.name}</a></h3><p>{product.description}</p><a class="product-details-link" href={detailsUrl}>Ver detalhes <Icon name="diagonal" size={16}/></a><div class="product-bottom"><span>Por {product.unit}<small>Sob consulta</small></span><button class="add-button" type="button" data-add={product.id} aria-label={`Adicionar ${product.name} à cotação`}><Icon name="plus" size={19}/><span>Adicionar</span></button></div></div>
 </article>

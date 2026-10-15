@@ -1,0 +1,35 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductGallery from '../../components/ProductGallery.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import Icon from '../../components/Icon.astro';
+import { products, productSpecifications } from '../../data/products';
+import { categories } from '../../data/company';
+import { path, contact } from '../../lib/urls';
+export function getStaticPaths() { return products.map(product => ({ params: { id: product.id }, props: { product } })); }
+const { product } = Astro.props;
+const category = categories.find(c => c.id === product.category)!;
+const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0,3);
+const description = product.fullDescription?.length ? product.fullDescription : [
+  product.description,
+  'Este item faz parte da apresentação das linhas de produtos da ALFAWALI. A descrição final, a marca e as características técnicas serão disponibilizadas após a confirmação do produto comercializado.',
+  'Para conhecer as opções disponíveis e a apresentação adequada à sua necessidade, inclua o item na cotação ou converse com o atendimento. Preços, pagamento e entrega no Rio Grande do Sul são combinados com a equipe comercial.',
+];
+---
+<Layout title={product.name} description={product.description} active="produtos">
+  <div class="container product-detail-container">
+    <nav class="product-breadcrumb" aria-label="Caminho do produto"><a href={path()}>Início</a><span aria-hidden="true">/</span><a href={path('produtos/')}>Produtos</a><span aria-hidden="true">/</span><a href={path(`produtos/?categoria=${product.category}`)}>{category.name}</a><span aria-hidden="true">/</span><span aria-current="page">{product.name}</span></nav>
+    <div class="product-detail-layout">
+      <ProductGallery product={product}/>
+      <section class="product-summary" aria-labelledby="product-title"><span class="eyebrow">{category.name}</span><h1 id="product-title">{product.name}<em>.</em></h1><p class="product-lead">{product.description}</p>
+        {product.demo && <p class="demo-notice small">Produto demonstrativo. Fotos, medidas, peso e demais especificações ainda serão confirmados pela ALFAWALI.</p>}
+        <div class="product-commercial"><span>Unidade de cotação<strong>{product.unit}</strong></span><span>Preço e disponibilidade<strong>Sob consulta</strong></span></div>
+        <div class="product-purchase"><label for="detail-quantity">Quantidade<input id="detail-quantity" type="number" value="1" min="1" max="999" step="1" inputmode="numeric"/></label><button class="button button-red" type="button" data-add={product.id} data-quantity-input="detail-quantity"><Icon name="plus" size={20}/> Adicionar à cotação</button></div>
+        <p class="product-purchase-help">Adicione à sua lista e revise a solicitação antes de abrir o WhatsApp.</p><a class="text-link" href={contact(`Olá! Gostaria de saber mais sobre ${product.name}, da linha ${category.name}, que vi no site da ALFAWALI.`)} target="_blank" rel="noopener noreferrer">Tirar uma dúvida sobre este produto <Icon name="diagonal" size={17}/></a>
+        <a class="product-back-link" href={path(`produtos/?categoria=${product.category}`)}>← Voltar para {category.name}</a>
+      </section>
+    </div>
+    <div class="product-information"><section class="product-description" aria-labelledby="description-title"><span class="eyebrow">CONHEÇA O PRODUTO</span><h2 id="description-title">Descrição completa.</h2>{description.map(paragraph => <p>{paragraph}</p>)}</section><section class="product-specifications" aria-labelledby="specifications-title"><span class="eyebrow">INFORMAÇÕES DO PRODUTO</span><h2 id="specifications-title">Ficha técnica.</h2><dl>{productSpecifications(product).map(spec => <div><dt>{spec.label}</dt><dd>{spec.value}</dd></div>)}</dl><p class="specification-note">Informações pendentes aparecem como “A confirmar”. Consulte a equipe para verificar as características e a disponibilidade.</p></section></div>
+    {related.length > 0 && <section class="related-products"><div class="section-heading"><div><span class="eyebrow">CONTINUE EXPLORANDO</span><h2>Na mesma linha.</h2></div><a class="text-link" href={path(`produtos/?categoria=${product.category}`)}>Ver linha {category.name} <Icon name="diagonal" size={18}/></a></div><div class="products-grid">{related.map(item => <ProductCard product={item}/>)}</div></section>}
+  </div>
+</Layout>

@@ -50,7 +50,7 @@ function renderCart() {
     const product = products.find(p => p.id === line.id)!;
     const row = element('div', 'quote-item');
     const detail = element('div');
-    detail.append(element('h3', '', product.name), element('p', '', `${product.unit} • exemplo ilustrativo`));
+    detail.append(element('h3', '', product.name), element('p', '', `${product.unit}${product.demo ? ' • exemplo ilustrativo' : ''}`));
     const controls = element('div', 'quantity-controls');
     const minus = element('button', '', '−');
     minus.type = 'button'; minus.setAttribute('aria-label', `Diminuir quantidade de ${product.name}`);
@@ -83,8 +83,13 @@ all<HTMLButtonElement>('[data-add]').forEach(button => button.addEventListener('
   const product = products.find(p => p.id === button.dataset.add);
   if (!product) return;
   const existing = cart.find(item => item.id === product.id);
+  const quantityInput = button.dataset.quantityInput ? document.getElementById(button.dataset.quantityInput) as HTMLInputElement | null : null;
+  if (quantityInput && !quantityInput.reportValidity()) return;
+  const amount = quantityInput ? quantityInput.valueAsNumber : 1;
+  if (!Number.isInteger(amount) || amount < 1 || amount > MAX_QUANTITY) return;
   if (existing?.quantity === MAX_QUANTITY) { toast('Quantidade máxima atingida para este item.'); return; }
-  updateCart(existing ? cart.map(item => item.id === product.id ? { ...item, quantity: item.quantity+1 } : item) : [...cart, { id: product.id, quantity: 1 }]);
+  const total = Math.min(MAX_QUANTITY, (existing?.quantity || 0) + amount);
+  updateCart(existing ? cart.map(item => item.id === product.id ? { ...item, quantity: total } : item) : [...cart, { id: product.id, quantity: total }]);
   toast(storageAvailable ? `${product.name} adicionado à cotação.` : 'Item adicionado. Seu navegador não está salvando a lista entre páginas.');
 }));
 
@@ -184,4 +189,33 @@ if (contactForm) {
   });
   query('[data-contact-edit]')!.addEventListener('click', () => { contactForm.hidden = false; query('[data-contact-review]')!.hidden = true; query<HTMLAnchorElement>('[data-contact-link]')!.removeAttribute('href'); query('[data-contact-message]')!.textContent = ''; query<HTMLInputElement>('#contact-form input[name=name]')!.focus(); });
 }
+all<HTMLElement>('[data-product-gallery]').forEach(gallery => {
+  const panels = [...gallery.querySelectorAll<HTMLElement>('[data-gallery-panel]')];
+  const thumbnails = [...gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumbnail]')];
+  const captions = [...gallery.querySelectorAll<HTMLElement>('[data-gallery-caption]')];
+  const viewer = gallery.querySelector<HTMLDialogElement>('[data-image-dialog]')!;
+  const expand = gallery.querySelector<HTMLButtonElement>('[data-gallery-expand]')!;
+  let selected = 0;
+  function select(index: number) {
+    selected = (index + thumbnails.length) % thumbnails.length;
+    panels.forEach(panel => panel.hidden = Number(panel.dataset.galleryPanel) !== selected);
+    thumbnails.forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.galleryThumbnail) === selected)));
+    const current = panels.find(panel => Number(panel.dataset.galleryPanel) === selected)!;
+    captions.forEach(caption => caption.textContent = `${selected + 1} / ${thumbnails.length} · ${current.getAttribute('aria-label')}`);
+  }
+  thumbnails.forEach(button => button.addEventListener('click', () => select(Number(button.dataset.galleryThumbnail))));
+  gallery.querySelectorAll('[data-gallery-prev]').forEach(button => button.addEventListener('click', () => select(selected - 1)));
+  gallery.querySelectorAll('[data-gallery-next]').forEach(button => button.addEventListener('click', () => select(selected + 1)));
+  expand.addEventListener('click', () => { viewer.showModal(); document.body.classList.add('image-open'); });
+  viewer.querySelector('[data-image-close]')!.addEventListener('click', () => viewer.close());
+  viewer.addEventListener('close', () => { document.body.classList.remove('image-open'); expand.focus(); });
+  viewer.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); select(selected + (event.key === 'ArrowRight' ? 1 : -1)); }
+  });
+  viewer.addEventListener('click', event => {
+    if (event.target !== viewer) return;
+    const bounds = viewer.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) viewer.close();
+  });
+});
 renderCart();

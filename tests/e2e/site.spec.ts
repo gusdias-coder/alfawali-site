@@ -75,3 +75,54 @@ test('menu de celular acessível',async({page},testInfo)=>{
   await page.getByRole('navigation',{name:'Menu principal'}).getByRole('link',{name:'Produtos'}).click();
   await expect(page.locator('#product-search')).toBeVisible();
 });
+
+test('detalhes do produto, galeria ampliada e quantidade na cotação',async({page},testInfo)=>{
+  const errors:string[]=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('produtos/?categoria=quimicos');
+  await page.locator('[data-id="quimicos-01"]').getByRole('link',{name:'Ver detalhes',exact:true}).click();
+  await expect(page).toHaveURL(/\/produtos\/quimicos-01\/$/);
+  await expect(page.locator('h1')).toContainText('Limpador multiuso');
+  await expect(page.getByRole('heading',{name:'Descrição completa.'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Ficha técnica.'})).toBeVisible();
+  await expect(page.locator('dl')).toContainText('Tamanho / dimensões');
+  await expect(page.locator('dl')).toContainText('Peso');
+  await page.locator('[data-gallery-thumbnail="1"]').click();
+  await expect(page.locator('[data-gallery-thumbnail="1"]')).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'Ampliar imagem'}).click();
+  const viewer=page.locator('[data-image-dialog]');
+  await expect(viewer).toBeVisible();
+  await viewer.getByRole('button',{name:'Próxima imagem'}).click();
+  await expect(viewer.locator('[data-gallery-caption]')).toContainText('1 / 2');
+  await page.keyboard.press('ArrowRight');
+  await expect(viewer.locator('[data-gallery-caption]')).toContainText('2 / 2');
+  await page.keyboard.press('Escape');
+  await expect(viewer).not.toBeVisible();
+  await expect(page.getByRole('button',{name:'Ampliar imagem'})).toBeFocused();
+  await page.locator('#detail-quantity').fill('4');
+  await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
+  await page.locator('[data-open-quote]').click();
+  await expect(page.locator('.quantity-controls input')).toHaveValue('4');
+  await page.locator('[data-close-quote]').click();
+  await page.screenshot({path:`output/screenshots/${testInfo.project.name}-detalhe-produto.png`,fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
+  await page.getByRole('link',{name:'← Voltar para Químicos'}).click();
+  await expect(page).toHaveURL(/categoria=quimicos/);
+  await expect(page.locator('[data-product-card]:visible')).toHaveCount(2);
+  expect(errors).toEqual([]);
+});
+
+test('quantidade inválida não entra na lista pelo detalhe',async({page})=>{
+  await page.goto('produtos/coffee-01/');
+  for(const quantity of ['0','1000','1.5','']) {
+    await page.locator('#detail-quantity').fill(quantity);
+    await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
+    await expect(page.locator('[data-cart-count]')).toHaveText('0');
+  }
+  await page.locator('#detail-quantity').fill('999');
+  await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
+  await page.locator('#detail-quantity').fill('1');
+  await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
+  await page.locator('[data-open-quote]').click();
+  await expect(page.locator('.quantity-controls input')).toHaveValue('999');
+});

@@ -1,5 +1,18 @@
 import type { CategoryId } from './company';
 
+export interface ProductImage { src: string; alt: string }
+export interface ProductSpecifications {
+  brand?: string;
+  reference?: string;
+  dimensions?: string;
+  weight?: string;
+  capacity?: string;
+  material?: string;
+  color?: string;
+  packaging?: string;
+  additional?: { label: string; value: string }[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -8,6 +21,9 @@ export interface Product {
   unit: string;
   illustration: string;
   demo: boolean;
+  fullDescription?: string[];
+  specifications?: ProductSpecifications;
+  images?: ProductImage[];
 }
 
 // Exemplos genéricos para apresentação, não correspondem a estoque confirmado.
@@ -29,3 +45,20 @@ export const products: Product[] = [
   { id: 'equipamentos-01', name: 'Conjunto de limpeza', category: 'equipamentos', description: 'Exemplo de utensílios de apoio para a limpeza dos ambientes.', unit: 'kit', illustration: 'equipment', demo: true },
   { id: 'equipamentos-02', name: 'Balde para limpeza', category: 'equipamentos', description: 'Exemplo de equipamento para apoio às tarefas de limpeza.', unit: 'unidade', illustration: 'equipment', demo: true },
 ];
+
+// Preencha os campos com dados aprovados pelo fornecedor; imagens locais em public/.
+export function productSpecifications(product: Product) {
+  const specs = product.specifications || {};
+  return [
+    { label: 'Marca', value: specs.brand || 'A confirmar' },
+    { label: 'Referência do fabricante', value: specs.reference || 'A confirmar' },
+    { label: 'Tamanho / dimensões', value: specs.dimensions || 'A confirmar' },
+    { label: 'Peso', value: specs.weight || 'A confirmar' },
+    { label: 'Volume / capacidade', value: specs.capacity || 'A confirmar' },
+    { label: 'Material / composição', value: specs.material || 'A confirmar' },
+    { label: 'Cor', value: specs.color || 'A confirmar' },
+    { label: 'Embalagem / apresentação', value: specs.packaging || 'A confirmar' },
+    { label: 'Unidade de cotação', value: product.unit },
+    ...(specs.additional || []),
+  ];
+}
