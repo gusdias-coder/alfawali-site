@@ -1,0 +1,31 @@
+import type { CategoryId } from './company';
+
+export interface Product {
+  id: string;
+  name: string;
+  category: CategoryId;
+  description: string;
+  unit: string;
+  illustration: string;
+  demo: boolean;
+}
+
+// Exemplos genéricos para apresentação, não correspondem a estoque confirmado.
+export const products: Product[] = [
+  { id: 'coffee-01', name: 'Café para a sua empresa', category: 'coffee', description: 'Exemplo de item para abastecimento da copa. Marca e embalagem a confirmar.', unit: 'embalagem', illustration: 'coffee', demo: true },
+  { id: 'coffee-02', name: 'Açúcar em sachês', category: 'coffee', description: 'Exemplo de produto porcionado para a rotina do café.', unit: 'caixa', illustration: 'coffee', demo: true },
+  { id: 'office-01', name: 'Papel para escritório', category: 'office', description: 'Exemplo de suprimento para atividades administrativas.', unit: 'pacote', illustration: 'office', demo: true },
+  { id: 'office-02', name: 'Materiais de papelaria', category: 'office', description: 'Exemplo de itens para organização do ambiente de trabalho.', unit: 'kit', illustration: 'office', demo: true },
+  { id: 'sacos-01', name: 'Saco para lixo', category: 'sacos', description: 'Exemplo de material para descarte. Medidas e capacidade a confirmar.', unit: 'pacote', illustration: 'bag', demo: true },
+  { id: 'sacos-02', name: 'Saco para coleta seletiva', category: 'sacos', description: 'Exemplo de solução para organização e separação de resíduos.', unit: 'pacote', illustration: 'bag', demo: true },
+  { id: 'copos-01', name: 'Copo descartável', category: 'copos', description: 'Exemplo para servir bebidas. Material e capacidade a confirmar.', unit: 'pacote', illustration: 'cup', demo: true },
+  { id: 'copos-02', name: 'Copo para café', category: 'copos', description: 'Exemplo de descartável para os intervalos do trabalho.', unit: 'pacote', illustration: 'cup', demo: true },
+  { id: 'dispensers-01', name: 'Dispenser de sabonete', category: 'dispensers', description: 'Exemplo de acessório para ambientes de higiene.', unit: 'unidade', illustration: 'dispenser', demo: true },
+  { id: 'dispensers-02', name: 'Dispenser de papel', category: 'dispensers', description: 'Exemplo de suporte para distribuição de papel.', unit: 'unidade', illustration: 'dispenser', demo: true },
+  { id: 'papeis-01', name: 'Papel toalha', category: 'papeis', description: 'Exemplo de insumo para higiene e cuidado diário.', unit: 'pacote', illustration: 'paper', demo: true },
+  { id: 'papeis-02', name: 'Papel higiênico', category: 'papeis', description: 'Exemplo para reposição em banheiros e áreas de uso comum.', unit: 'pacote', illustration: 'paper', demo: true },
+  { id: 'quimicos-01', name: 'Limpador multiuso', category: 'quimicos', description: 'Exemplo de produto de limpeza. Aplicações e diluição dependem do fabricante.', unit: 'embalagem', illustration: 'bottle', demo: true },
+  { id: 'quimicos-02', name: 'Detergente', category: 'quimicos', description: 'Exemplo de insumo de limpeza. Formulação e volume a confirmar.', unit: 'embalagem', illustration: 'bottle', demo: true },
+  { id: 'equipamentos-01', name: 'Conjunto de limpeza', category: 'equipamentos', description: 'Exemplo de utensílios de apoio para a limpeza dos ambientes.', unit: 'kit', illustration: 'equipment', demo: true },
+  { id: 'equipamentos-02', name: 'Balde para limpeza', category: 'equipamentos', description: 'Exemplo de equipamento para apoio às tarefas de limpeza.', unit: 'unidade', illustration: 'equipment', demo: true },
+];

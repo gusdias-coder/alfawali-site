@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+output/
+tmp/
+test-results/
+playwright-report/
+scripts/create_pdf.py
+scripts/create_options_pdf.py
+*.log
+.DS_Store

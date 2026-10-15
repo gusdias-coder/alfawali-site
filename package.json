@@ -1,0 +1,27 @@
+{
+  "name": "alfawali-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": { "node": ">=22.22.0" },
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "check": "astro check",
+    "test": "node --test tests/quote.test.ts",
+    "build": "astro build",
+    "verify": "pnpm check && pnpm test && pnpm build && node scripts/check-build.mjs",
+    "preview": "astro preview --host 127.0.0.1",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "astro": "7.4.0",
+    "@fontsource-variable/manrope": "5.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.64.1",
+    "sharp": "0.35.5",
+    "typescript": "5.9.3"
+  }
+}
