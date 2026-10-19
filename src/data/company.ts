@@ -8,8 +8,8 @@ export const company = {
   // Preencher somente com informações oficiais fornecidas pela empresa.
   email: '',
   address: '',
-  cnpj: '',
-  legalName: '',
+  cnpj: '52.892.758/0001-85',
+  legalName: 'ALFAWALI COMERCIO VAREJISTA DE SUPRIMENTOS E PRESTACAO DE SERVICOS TERCEIRIZADOS LTDA',
   // Só vira true depois que o responsável revisar privacidade e condições.
   policiesReviewed: false,
 };

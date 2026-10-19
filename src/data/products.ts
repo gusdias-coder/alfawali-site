@@ -16,6 +16,15 @@ export interface ProductSpecifications {
 export interface Product {
   id: string;
   name: string;
+  status: 'draft' | 'approved' | 'retired';
+  packaging: string;
+  minimum: number;
+  multiple: number;
+  pricePolicy: 'quote' | 'fixed';
+  priceCents?: number;
+  priceValidUntil?: string;
+  availabilityText: string;
+  updatedAt: string;
   category: CategoryId;
   description: string;
   unit: string;
@@ -27,7 +36,7 @@ export interface Product {
 }
 
 // Exemplos genéricos para apresentação, não correspondem a estoque confirmado.
-export const products: Product[] = [
+const demoProducts: Omit<Product, 'status' | 'packaging' | 'minimum' | 'multiple' | 'pricePolicy' | 'availabilityText' | 'updatedAt'>[] = [
   { id: 'coffee-01', name: 'Café para a sua empresa', category: 'coffee', description: 'Exemplo de item para abastecimento da copa. Marca e embalagem a confirmar.', unit: 'embalagem', illustration: 'coffee', demo: true },
   { id: 'coffee-02', name: 'Açúcar em sachês', category: 'coffee', description: 'Exemplo de produto porcionado para a rotina do café.', unit: 'caixa', illustration: 'coffee', demo: true },
   { id: 'office-01', name: 'Papel para escritório', category: 'office', description: 'Exemplo de suprimento para atividades administrativas.', unit: 'pacote', illustration: 'office', demo: true },
@@ -45,6 +54,12 @@ export const products: Product[] = [
   { id: 'equipamentos-01', name: 'Conjunto de limpeza', category: 'equipamentos', description: 'Exemplo de utensílios de apoio para a limpeza dos ambientes.', unit: 'kit', illustration: 'equipment', demo: true },
   { id: 'equipamentos-02', name: 'Balde para limpeza', category: 'equipamentos', description: 'Exemplo de equipamento para apoio às tarefas de limpeza.', unit: 'unidade', illustration: 'equipment', demo: true },
 ];
+
+// Regras da demonstração; não representam mínimos ou embalagens comerciais aprovados.
+export const products: Product[] = demoProducts.map(product => ({
+  ...product, status: 'draft', packaging: 'Apresentação a confirmar', minimum: 1, multiple: 1,
+  pricePolicy: 'quote', availabilityText: 'Disponibilidade e prazo serão confirmados na proposta.', updatedAt: '2026-10-18',
+}));
 
 // Preencha os campos com dados aprovados pelo fornecedor; imagens locais em public/.
 export function productSpecifications(product: Product) {

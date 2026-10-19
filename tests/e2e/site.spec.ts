@@ -3,7 +3,7 @@ test('todas as páginas, sem erros, imagens carregadas e sem overflow', async ({
   const errors: string[]=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error') errors.push(m.text());});
-  for (const route of ['', 'empresa/', 'servicos/', 'produtos/', 'contato/', 'privacidade/']) {
+  for (const route of ['', 'empresa/', 'servicos/', 'produtos/', 'contato/', 'privacidade/', 'orcamento/', 'condicoes/', 'atendimento/']) {
     const response = await page.goto(route);
     expect(response?.status()).toBe(200);
     await expect(page.locator('h1')).toBeVisible();
@@ -44,7 +44,7 @@ test('cotação persiste, revisa mensagem e trata texto como texto',async({page}
   expect(url.searchParams.get('text')).toContain('2 embalagem(s)');
   expect(url.searchParams.get('text')).toContain('DEMONSTRAÇÃO');
   await page.getByRole('button',{name:'Voltar e editar'}).click();
-  await page.locator('[data-close-quote]').click();
+  await page.goBack();
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain('Porto Alegre');
 });
 test('contato exige dados, gera revisão e permite editar',async({page})=>{
@@ -60,7 +60,7 @@ test('contato exige dados, gera revisão e permite editar',async({page})=>{
   await expect(page.locator('#contact-form')).toBeVisible();
 });
 test('armazenamento corrompido não interrompe o catálogo',async({page})=>{
-  await page.addInitScript(()=>localStorage.setItem('alfawali:quote:v1:/alfawali-site/','invalid-json'));
+  await page.addInitScript(()=>{ if (!sessionStorage.getItem('corruption-injected')) { localStorage.setItem('alfawali:quote:v1:/','invalid-json'); sessionStorage.setItem('corruption-injected','yes'); } });
   await page.goto('produtos/?categoria=copos');
   await expect(page.locator('[data-product-card]:visible')).toHaveCount(2);
   await page.locator('[data-add="copos-01"]').click();
@@ -81,7 +81,7 @@ test('detalhes do produto, galeria ampliada e quantidade na cotação',async({pa
   page.on('pageerror',error=>errors.push(error.message));
   await page.goto('produtos/?categoria=quimicos');
   await page.locator('[data-id="quimicos-01"]').getByRole('link',{name:'Ver detalhes',exact:true}).click();
-  await expect(page).toHaveURL(/\/produtos\/quimicos-01\/$/);
+  await expect(page).toHaveURL(/\/produtos\/quimicos-01\//);
   await expect(page.locator('h1')).toContainText('Limpador multiuso');
   await expect(page.getByRole('heading',{name:'Descrição completa.'})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Ficha técnica.'})).toBeVisible();
@@ -103,7 +103,7 @@ test('detalhes do produto, galeria ampliada e quantidade na cotação',async({pa
   await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
   await page.locator('[data-open-quote]').click();
   await expect(page.locator('.quantity-controls input')).toHaveValue('4');
-  await page.locator('[data-close-quote]').click();
+  await page.goBack();
   await page.screenshot({path:`output/screenshots/${testInfo.project.name}-detalhe-produto.png`,fullPage:true});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.getByRole('link',{name:'← Voltar para Químicos'}).click();
@@ -125,4 +125,55 @@ test('quantidade inválida não entra na lista pelo detalhe',async({page})=>{
   await page.getByRole('button',{name:'Adicionar à cotação',exact:true}).click();
   await page.locator('[data-open-quote]').click();
   await expect(page.locator('.quantity-controls input')).toHaveValue('999');
+});
+
+test('orçamento é uma página, preserva lista ao revisar e oferece alternativa para texto longo', async ({page}) => {
+  await page.goto('produtos/');
+  await page.locator('[data-add="coffee-01"]').click();
+  await page.locator('[data-open-quote]').click();
+  await expect(page).toHaveURL(/orcamento\//);
+  await page.locator('#quote-form input[name="name"]').fill('Teste');
+  await page.locator('#quote-form input[name="city"]').fill('Porto Alegre');
+  await page.locator('#quote-form textarea[name="notes"]').fill('á'.repeat(400));
+  await page.getByRole('button',{name:'Preparar mensagem'}).click();
+  await expect(page.locator('[data-long-message]')).toBeVisible();
+  await expect(page.locator('[data-message-link]')).toHaveAttribute('href','https://wa.me/5551991005271');
+  await expect(page.locator('[data-copy-message]')).toBeVisible();
+  await page.reload();
+  await expect(page.locator('.quote-item')).toHaveCount(1);
+  await expect(page.locator('#quote-form input[name="name"]')).toHaveValue('');
+  await page.getByRole('button',{name:'Limpar lista',exact:true}).click();
+  await expect(page.locator('[data-empty-cart]')).toBeVisible();
+});
+
+test('busca por código e ordenação persistem ao voltar do produto', async ({page}) => {
+  await page.goto('produtos/?q=coffee-01&ordem=za');
+  await expect(page.locator('[data-product-card]:visible')).toHaveCount(1);
+  await page.locator('[data-id="coffee-01"]').getByRole('link',{name:'Ver detalhes',exact:true}).click();
+  await page.locator('.product-back-link').click();
+  await expect(page.locator('#product-search')).toHaveValue('coffee-01');
+  await expect(page.locator('#product-sort')).toHaveValue('za');
+});
+test('storage negado mantém a lista em memória e apresenta aviso', async ({page}) => {
+  await page.addInitScript(() => { Object.defineProperty(window,'localStorage',{get(){throw new Error('negado');}}); });
+  await page.goto('produtos/');
+  await page.locator('[data-add="coffee-01"]').click();
+  await page.locator('[data-open-quote]').click();
+  await expect(page.locator('#quote-dialog')).toBeVisible();
+  await expect(page.locator('.quote-item')).toHaveCount(1);
+  await expect(page.locator('[data-storage-notice]')).toBeVisible();
+});
+
+test('modelos em cinco larguras e orçamento preenchido', async ({page}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop');
+  for (const width of [320,390,768,1024,1440]) {
+    await page.setViewportSize({width,height:900});
+    for (const route of ['', 'produtos/', 'produtos/coffee-01/', 'orcamento/']) {
+      await page.goto(route);
+      if (route === 'produtos/coffee-01/') await page.locator('[data-add="coffee-01"]').first().click();
+      await page.evaluate(()=>document.fonts.ready);
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      await page.screenshot({path:`output/screenshots/modelo-${width}-${route.replaceAll('/','-') || 'home'}.png`,fullPage:true});
+    }
+  }
 });
