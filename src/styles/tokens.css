@@ -1,0 +1,34 @@
+/* Cores de marca constantes; tokens semânticos variam por tema. Imagens não recebem filtros. */
+:root {
+  --brand-navy:#173747;--brand-red:#ad2034;--footer:#122b3a;
+  --font:'Manrope Variable',system-ui,sans-serif;--radius:5px;--duration:160ms;
+  --background:#f8fafb;--surface:#ffffff;--surface-alt:#eef2f5;--surface-hover:#e7edf1;
+  --text:#183343;--text-muted:#526674;--border:#d7e0e6;--input-border:#7b8e9c;
+  --accent:#ad2034;--action:#ad2034;--action-hover:#8f182b;--on-action:#ffffff;
+  --strong:#173747;--strong-hover:#254c60;--on-strong:#ffffff;
+  --focus:#a32034;--selection:#d9e4ee;
+  --notice:#f4f1e8;--notice-text:#62543a;--notice-border:#d9ceae;
+  --error:#a71c30;--error-surface:#fff0f2;--art-surface:#eaf0ec;
+  --shadow:0 6px 18px #1737470d;color-scheme:light;
+}
+/* A mesma paleta atende à preferência do dispositivo e à escolha manual. */
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme=light]) {
+    --background:#101e28;--surface:#172b38;--surface-alt:#1d3342;--surface-hover:#294554;
+    --text:#edf4f8;--text-muted:#b2c4d0;--border:#3a5262;--input-border:#708c9d;
+    --accent:#ff9eaf;--action:#be2942;--action-hover:#a61e36;--on-action:#ffffff;
+    --strong:#dae7ef;--strong-hover:#c3d7e4;--on-strong:#132f40;
+    --focus:#ffb8c5;--selection:#39566b;
+    --notice:#343329;--notice-text:#e1d6b9;--notice-border:#6f674c;
+    --error:#ffb3c0;--error-surface:#452633;--shadow:0 6px 18px #0002;color-scheme:dark;
+  }
+}
+:root[data-theme=dark] {
+  --background:#101e28;--surface:#172b38;--surface-alt:#1d3342;--surface-hover:#294554;
+  --text:#edf4f8;--text-muted:#b2c4d0;--border:#3a5262;--input-border:#708c9d;
+  --accent:#ff9eaf;--action:#be2942;--action-hover:#a61e36;--on-action:#ffffff;
+  --strong:#dae7ef;--strong-hover:#c3d7e4;--on-strong:#132f40;
+  --focus:#ffb8c5;--selection:#39566b;
+  --notice:#343329;--notice-text:#e1d6b9;--notice-border:#6f674c;
+  --error:#ffb3c0;--error-surface:#452633;--shadow:0 6px 18px #0002;color-scheme:dark;
+}

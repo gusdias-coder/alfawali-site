@@ -72,8 +72,10 @@ export function productSpecifications(product: Product) {
     { label: 'Volume / capacidade', value: specs.capacity || 'A confirmar' },
     { label: 'Material / composição', value: specs.material || 'A confirmar' },
     { label: 'Cor', value: specs.color || 'A confirmar' },
-    { label: 'Embalagem / apresentação', value: specs.packaging || 'A confirmar' },
+    { label: 'Embalagem / apresentação', value: specs.packaging || product.packaging },
     { label: 'Unidade de cotação', value: product.unit },
+    { label: 'Quantidade mínima', value: product.demo ? 'A confirmar' : String(product.minimum) },
+    { label: 'Múltiplo de cotação', value: product.demo ? 'A confirmar' : String(product.multiple) },
     ...(specs.additional || []),
   ];
 }

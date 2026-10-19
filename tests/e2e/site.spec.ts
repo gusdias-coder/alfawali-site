@@ -72,6 +72,10 @@ test('menu de celular acessível',async({page},testInfo)=>{
   await page.goto('');
   await page.getByRole('button',{name:'Abrir menu'}).click();
   await expect(page.getByRole('navigation',{name:'Menu principal'})).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Abrir menu'})).toBeFocused();
+  await expect(page.getByRole('navigation',{name:'Menu principal'})).toBeHidden();
+  await page.getByRole('button',{name:'Abrir menu'}).click();
   await page.getByRole('navigation',{name:'Menu principal'}).getByRole('link',{name:'Produtos'}).click();
   await expect(page.locator('#product-search')).toBeVisible();
 });

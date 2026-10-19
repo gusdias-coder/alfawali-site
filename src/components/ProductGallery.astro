@@ -16,10 +16,10 @@ const media = product.images?.length ? product.images.map(image => ({ ...image, 
       {image.src ? <img src={path(image.src)} alt={image.alt} width="1000" height="1000" loading={index ? 'lazy' : 'eager'}/> : <ProductArt kind={product.illustration}/>}
     </div>)}
     <span class="gallery-badge">{product.images?.length ? (product.demo ? 'Imagem de demonstração' : 'Imagens do produto') : 'Ilustração de demonstração'}</span>
-    <button class="gallery-expand" type="button" data-gallery-expand aria-haspopup="dialog"><Icon name="search" size={18}/> Ampliar imagem</button>
+    <button class="gallery-expand" type="button" data-gallery-expand aria-haspopup="dialog" data-enhanced hidden><Icon name="search" size={18}/> Ampliar imagem</button>
   </div>
-  <div class="gallery-navigation"><p data-gallery-caption aria-live="polite">1 / {media.length} · {media[0].alt}</p><div><button class="icon-button" type="button" data-gallery-prev aria-label="Imagem anterior" disabled={media.length < 2}>←</button><button class="icon-button" type="button" data-gallery-next aria-label="Próxima imagem" disabled={media.length < 2}>→</button></div></div>
-  <div class="gallery-thumbnails" aria-label="Escolher imagem">
+  <div class="gallery-navigation" data-enhanced hidden><p data-gallery-caption aria-live="polite">1 / {media.length} · {media[0].alt}</p><div><button class="icon-button" type="button" data-gallery-prev aria-label="Imagem anterior" disabled={media.length < 2}>←</button><button class="icon-button" type="button" data-gallery-next aria-label="Próxima imagem" disabled={media.length < 2}>→</button></div></div>
+  <div class="gallery-thumbnails" aria-label="Escolher imagem" data-enhanced hidden>
     {media.map((image,index) => <button class:list={['gallery-thumbnail', { 'illustration-zoom': image.zoom }]} type="button" data-gallery-thumbnail={index} aria-pressed={index === 0 ? 'true' : 'false'} aria-label={`Ver imagem ${index + 1}: ${image.alt}`}>
       {image.src ? <img src={path(image.src)} alt="" width="100" height="100" loading="lazy"/> : <ProductArt kind={product.illustration}/>}
     </button>)}

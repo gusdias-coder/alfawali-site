@@ -77,7 +77,7 @@ function renderCart() {
     input.addEventListener('change', () => change(input.valueAsNumber, input.getAttribute('aria-label')!));
     const remove = element('button', 'remove-item', 'Remover');
     remove.type = 'button'; remove.setAttribute('aria-label', `Remover ${product.name}`);
-    remove.addEventListener('click', () => { updateCart(cart.filter(item => item.id !== line.id)); query<HTMLButtonElement>('[data-clear-cart]')?.focus(); });
+    remove.addEventListener('click', () => { updateCart(cart.filter(item => item.id !== line.id)); (cart.length ? query<HTMLButtonElement>('[data-clear-cart]') : query<HTMLAnchorElement>('[data-empty-cart] a'))?.focus(); });
     controls.append(minus, input, plus); row.append(detail, controls, remove); list.append(row);
   }
   query('[data-empty-cart]')!.hidden = cart.length > 0;
@@ -98,6 +98,8 @@ all<HTMLButtonElement>('[data-add]').forEach(button => button.addEventListener('
   const total = Math.min(Math.floor(MAX_QUANTITY / product.multiple) * product.multiple, (existing?.quantity || 0) + amount);
   if ((existing?.quantity || 0) + amount > MAX_QUANTITY) toast('Quantidade ajustada ao máximo permitido.');
   updateCart(existing ? cart.map(item => item.id === product.id ? { ...item, quantity: total } : item) : [...cart, { id: product.id, quantity: total }]);
+  button.classList.add('is-added');
+  setTimeout(() => button.classList.remove('is-added'), 1200);
   toast(storageAvailable ? `${product.name} adicionado à cotação.` : 'Item adicionado. Seu navegador não está salvando a lista entre páginas.');
 }));
 
@@ -153,9 +155,11 @@ query('[data-copy-message]')!.addEventListener('click', async () => {
 });
 const menu = query<HTMLButtonElement>('[data-menu]')!;
 const nav = query('#main-nav')!;
+menu.hidden = false;
 function closeMenu() { menu.setAttribute('aria-expanded', 'false'); menu.setAttribute('aria-label', 'Abrir menu'); nav.classList.remove('is-open'); }
 menu.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') !== 'true'; menu.setAttribute('aria-expanded', String(open)); nav.classList.toggle('is-open', open); menu.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu'); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { closeMenu(); menu.focus(); } });
+window.matchMedia('(min-width:901px)').addEventListener('change', () => closeMenu());
 document.addEventListener('click', event => { if (!nav.contains(event.target as Node) && !menu.contains(event.target as Node)) closeMenu(); });
 
 const search = query<HTMLInputElement>('#product-search');
@@ -225,6 +229,10 @@ nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMe
 const contactForm = query<HTMLFormElement>('#contact-form');
 if (contactForm) {
   query<HTMLFieldSetElement>('[data-contact-fields]')!.disabled = false;
+  // Parâmetro limitado aos escopos conhecidos; nenhum texto arbitrário entra no formulário.
+  const service = new URLSearchParams(location.search).get('servico');
+  const interests: Record<string,string> = {terceirizacao:'Terceirização de mão de obra',limpeza:'Serviços de limpeza',apoio:'Apoio à operação'};
+  if (service && Object.hasOwn(interests,service)) query<HTMLSelectElement>('#contact-form select[name=interest]')!.value = interests[service];
   contactForm.addEventListener('submit', event => {
     event.preventDefault();
     const error = query('[data-contact-error]')!;
@@ -272,3 +280,5 @@ all<HTMLElement>('[data-product-gallery]').forEach(gallery => {
   });
 });
 renderCart();
+// Controles dependentes de JS aparecem somente quando a inicialização termina.
+all<HTMLElement>('[data-enhanced]').forEach(control => control.hidden = false);

@@ -12,9 +12,9 @@ const { category } = Astro.props;
 const items = products.filter(p => p.category === category.id);
 ---
 <Layout title={category.name} description={category.description} active="produtos">
-  <div class="container product-detail-container">
+  <div class="container">
     <nav class="product-breadcrumb" aria-label="Caminho"><a href={path()}>Início</a><span aria-hidden="true">/</span><a href={path('produtos/')}>Produtos</a><span aria-hidden="true">/</span><span aria-current="page">{category.name}</span></nav>
   </div>
   <section class="page-hero container catalog-hero"><div><h1>{category.name}<em>.</em></h1><p>{category.description}</p></div></section>
-  <section class="container catalog-section"><p role="status">{items.length} {items.length === 1 ? 'item' : 'itens'} nesta categoria</p><div class="products-grid">{items.map(product => <ProductCard product={product}/>)}</div></section>
+  <section class="container catalog-section"><nav class="category-nav" aria-label="Categorias"><a href={path('produtos/')}>Todas as linhas</a>{categories.map(item => <a href={path(`produtos/categoria/${item.id}/`)} aria-current={item.id === category.id ? 'page' : undefined}>{item.name}</a>)}</nav><div class="catalog-results"><p role="status">{items.length} {items.length === 1 ? 'item demonstrativo' : 'itens demonstrativos'} nesta categoria</p><a class="text-link" href={`${path('produtos/')}?categoria=${category.id}`}>Buscar nesta linha →</a></div><div class="products-grid">{items.map(product => <ProductCard product={product}/>)}</div></section>
 </Layout>
