@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Site: iniciar (dev)",
+      "type": "shell",
+      "command": "corepack pnpm install --frozen-lockfile && corepack pnpm dev",
+      "isBackground": true,
+      "problemMatcher": { "pattern": { "regexp": "^$" }, "background": { "activeOnStart": true, "beginsPattern": "astro", "endsPattern": "Local" } },
+      "presentation": { "panel": "dedicated" },
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    { "label": "Site: verificar tudo", "type": "shell", "command": "corepack pnpm verify", "group": "test" },
+    { "label": "Site: prévia do build", "type": "shell", "command": "corepack pnpm build && corepack pnpm preview", "isBackground": true, "problemMatcher": [] }
+  ]
+}

@@ -79,3 +79,12 @@ As fotos devem existir em `public/images/produtos/` (o caminho em `src` não com
 6. Revalidar segurança, links, acessibilidade e fluxo do WhatsApp.
 
 Veja `SECURITY_REVIEW.md` para o escopo da revisão técnica. A marca e os materiais da ALFAWALI pertencem aos respectivos titulares; a publicação não concede licença de reutilização.
+
+## Rodar no VS Code
+
+Requisito: Node 22.22 ou superior.
+
+1. Abra a pasta do projeto no VS Code (`File > Open Folder`).
+2. Aceite "Allow automatic tasks" (ou execute `Terminal > Run Task > Site: iniciar (dev)`). Sem tasks automáticas, use o terminal: `corepack pnpm install` e depois `corepack pnpm dev`.
+3. Abra **http://127.0.0.1:4321/** no navegador. Use esse endereço, não o Live Server nem `index.html` direto: os links do site são absolutos (`/produtos/`) e só funcionam servidos na raiz.
+4. Para testar o resultado final: `corepack pnpm build && corepack pnpm preview` (mesma porta).
