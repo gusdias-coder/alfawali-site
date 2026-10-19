@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { company } from '../data/company';
+import { coverage, coverageFallback } from '../data/coverage';
+import { contact } from '../lib/urls';
+const confirmed = coverage.filter(c => c.status === 'confirmado');
+const labels = { produto: 'Produtos', servico: 'Serviços' } as const;
+---
+<Layout title="Atendimento" description="Cidades e condições de atendimento da ALFAWALI no Rio Grande do Sul." active="atendimento">
+  <section class="page-hero container"><div><h1>Onde e como <em>atendemos.</em></h1><p>Entrega de produtos e execução de serviços têm coberturas diferentes.</p></div></section>
+  <section class="container catalog-section">
+    {confirmed.length === 0
+      ? <p>{coverageFallback}</p>
+      : (['produto', 'servico'] as const).map(type => <><h2>{labels[type]}</h2><div style="overflow-x:auto"><table><thead><tr><th scope="col">Item</th><th scope="col">Cidade</th><th scope="col">Modalidade</th><th scope="col">Prazo indicativo</th><th scope="col">Condições</th></tr></thead><tbody>{confirmed.filter(c => c.type === type).map(c => <tr><td>{c.item}</td><td>{c.city}/{c.uf}</td><td>{c.mode ?? '—'}</td><td>{c.leadTime ?? '—'}</td><td>{[c.minOrder && `Pedido mínimo: ${c.minOrder}`, c.freight && `Frete: ${c.freight}`, c.restrictions].filter(Boolean).join('. ') || '—'}</td></tr>)}</tbody></table></div></>)}
+    <p><a class="button button-dark" href={contact('Olá! Gostaria de saber se vocês atendem a minha cidade.')} target="_blank" rel="noopener noreferrer">Perguntar sobre minha cidade</a></p>
+    <p class="form-help">Telefone e WhatsApp: {company.phoneDisplay}. Cidade que não aparece aqui: consulte a disponibilidade.</p>
+  </section>
+</Layout>

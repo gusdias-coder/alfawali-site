@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { company } from '../data/company';
+import { path } from '../lib/urls';
+---
+<Layout title="Orçamento" description="Monte a lista de produtos, revise a mensagem e abra o WhatsApp para solicitar uma proposta." active="produtos">
+  <section class="page-hero container"><div><h1>Sua lista de <em>orçamento.</em></h1><p>Escolha os produtos, revise a mensagem e abra o WhatsApp. Preparar a mensagem não envia a solicitação: o envio acontece no WhatsApp, por você.</p></div></section>
+  <section class="container catalog-section">
+    <ol class="steps">
+      <li><span>1</span><div><h2>Monte a lista</h2><p>Adicione itens e quantidades no <a href={path('produtos/')}>catálogo</a>.</p></div></li>
+      <li><span>2</span><div><h2>Revise a mensagem</h2><p>Você vê o texto exato antes de continuar.</p></div></li>
+      <li><span>3</span><div><h2>Abra o WhatsApp</h2><p>Envie por lá. Disponibilidade, preço e prazo são confirmados pela equipe.</p></div></li>
+    </ol>
+    <p><button class="button button-red" type="button" data-open-quote><Icon name="list" size={20}/> Abrir minha lista</button></p>
+    <p class="form-help">Sem JavaScript? Fale direto pelo WhatsApp {company.phoneDisplay}.</p>
+  </section>
+</Layout>

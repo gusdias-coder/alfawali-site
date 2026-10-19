@@ -9,6 +9,9 @@ export const company = {
   email: '',
   address: '',
   cnpj: '',
+  legalName: '',
+  // Só vira true depois que o responsável revisar privacidade e condições.
+  policiesReviewed: false,
 };
 
 export const clients: { name: string; logo: string }[] = [];

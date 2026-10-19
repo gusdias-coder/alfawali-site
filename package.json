@@ -4,15 +4,18 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.25.0",
-  "engines": { "node": ">=22.22.0" },
+  "engines": {
+    "node": ">=22.22.0"
+  },
   "scripts": {
     "dev": "astro dev --host 127.0.0.1",
     "check": "astro check",
-    "test": "node --test tests/quote.test.ts",
+    "test": "node --test tests/*.test.ts",
     "build": "astro build",
-    "verify": "pnpm check && pnpm test && pnpm build && node scripts/check-build.mjs",
+    "verify": "pnpm check && pnpm test && pnpm validate:content && pnpm build && node scripts/check-build.mjs",
     "preview": "astro preview --host 127.0.0.1",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "validate:content": "node scripts/validate-content.ts"
   },
   "dependencies": {
     "astro": "7.4.0",
