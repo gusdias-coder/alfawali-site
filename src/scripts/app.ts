@@ -1,6 +1,6 @@
 import { company, categories } from '../data/company';
 import { products } from '../data/products';
-import { validQuantity, sanitizeCart, restoreQuote, serializeQuote, messageDestination, MAX_ITEMS, normalize, MAX_QUANTITY, quoteMessage, whatsappLink, cleanField, type QuoteLine } from '../lib/quote';
+import { validQuantity, sanitizeCart, restoreValidQuote, serializeQuote, messageDestination, MAX_ITEMS, normalize, MAX_QUANTITY, quoteMessage, whatsappLink, cleanField, type QuoteLine } from '../lib/quote';
 
 const query = <T extends Element = HTMLElement>(selector: string) => document.querySelector<T>(selector);
 const all = <T extends Element = HTMLElement>(selector: string) => [...document.querySelectorAll<T>(selector)];
@@ -8,7 +8,7 @@ const storageKey = `alfawali:quote:v1:${import.meta.env.BASE_URL}`;
 const ids = products.filter(p => p.status !== 'retired').map(p => p.id);
 let cart: QuoteLine[] = [];
 let storageAvailable = true;
-try { cart = restoreQuote(localStorage.getItem(storageKey), ids); } catch { storageAvailable = false; }
+try { cart = restoreValidQuote(localStorage.getItem(storageKey), products); } catch { storageAvailable = false; }
 const dialog = query<HTMLDialogElement>('#quote-dialog')!;
 let previousFocus: HTMLElement | null = null;
 let toastTimer: ReturnType<typeof setTimeout>;
@@ -118,7 +118,7 @@ dialog.addEventListener('click', event => {
 dialog.addEventListener('close', () => { document.body.classList.remove('dialog-open'); previousFocus?.focus(); });
 window.addEventListener('storage', event => {
   if (event.key !== storageKey && event.key !== null) return;
-  try { cart = restoreQuote(event.newValue, ids); } catch { cart = []; }
+  try { cart = restoreValidQuote(event.newValue, products); } catch { cart = []; }
   invalidateMessage(); renderCart();
 });
 

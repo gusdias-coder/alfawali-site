@@ -19,6 +19,16 @@ export function restoreQuote(raw: string | null, allowedIds: readonly string[], 
     }), allowedIds);
   } catch { return []; }
 }
+/** Restaura apenas itens ativos com quantidades válidas segundo as regras atuais do catálogo. */
+export function restoreValidQuote(raw: string | null, products: readonly QuoteProduct[], now = Date.now()): QuoteLine[] {
+  const activeProducts = products.filter(product => product.status !== 'retired');
+  const byId = new Map(activeProducts.map(product => [product.id, product]));
+  return restoreQuote(raw, [...byId.keys()], now).filter(line => {
+    const product = byId.get(line.id);
+    return Boolean(product && validQuantity(line.quantity, product));
+  });
+}
+
 export function serializeQuote(lines: QuoteLine[], allowedIds: readonly string[], now = Date.now()): string {
   return JSON.stringify({ version: 1, updatedAt: new Date(now).toISOString(), items: sanitizeCart(lines, allowedIds).map(line => ({ productId: line.id, quantity: line.quantity })) });
 }
