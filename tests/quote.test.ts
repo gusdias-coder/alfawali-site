@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validQuantity, restoreQuote, serializeQuote, messageDestination, QUOTE_TTL_MS, normalize, sanitizeCart, quoteMessage, whatsappLink, cleanField } from '../src/lib/quote.ts';
+import { validQuantity, restoreQuote, restoreValidQuote, serializeQuote, messageDestination, QUOTE_TTL_MS, normalize, sanitizeCart, quoteMessage, whatsappLink, cleanField } from '../src/lib/quote.ts';
 const products = [{ id: 'coffee-01', name: 'Café', unit: 'pacote', demo: true }];
 test('busca ignora acentos e caixa', () => assert.equal(normalize(' CAFÉ '), 'cafe'));
 test('dados corrompidos e ids desconhecidos são descartados', () => {
@@ -60,4 +60,26 @@ test('mínimos e múltiplos comerciais são respeitados', () => {
   for (const quantity of [0,1,3,7,1000,6.5,NaN]) assert.equal(validQuantity(quantity,{minimum:6,multiple:3}),false);
   assert.equal(validQuantity(6,{minimum:6,multiple:3}),true);
   assert.equal(validQuantity(999,{minimum:6,multiple:3}),true);
+});
+
+
+test('restauração descarta quantidades incompatíveis com as regras atuais do catálogo', () => {
+  const catalog = [
+    { id: 'coffee-01', name: 'Café', unit: 'pacote', demo: true, minimum: 6, multiple: 3, status: 'draft' },
+    { id: 'coffee-02', name: 'Açúcar', unit: 'caixa', demo: true, minimum: 2, multiple: 2, status: 'draft' },
+    { id: 'retired-01', name: 'Inativo', unit: 'unidade', demo: true, minimum: 1, multiple: 1, status: 'retired' },
+  ];
+  const now = Date.parse('2026-10-18T12:00:00Z');
+  const raw = JSON.stringify({ version: 1, updatedAt: new Date(now).toISOString(), items: [
+    { productId: 'coffee-01', quantity: 1 },
+    { productId: 'coffee-01', quantity: 9 },
+    { productId: 'coffee-02', quantity: 3 },
+    { productId: 'coffee-02', quantity: 4 },
+    { productId: 'retired-01', quantity: 1 },
+    { productId: 'unknown', quantity: 1 },
+  ] });
+  assert.deepEqual(restoreValidQuote(raw, catalog, now), [
+    { id: 'coffee-01', quantity: 9 },
+    { id: 'coffee-02', quantity: 4 },
+  ]);
 });
